@@ -1,0 +1,94 @@
+
+SpeedyCGI version 1.3, 3/21/99
+
+Overview
+========
+
+SpeedyCGI is a way to run CGI perl scripts persistently, which usually
+makes them run much more quickly.  Converting scripts to use SpeedyCGI is
+in most cases as simple has changing the interpreter line at the top of
+the script from
+
+    #!/usr/local/bin/perl
+
+to
+
+    #!/usr/local/bin/speedy
+
+After the script is initially run, instead of exiting, SpeedyCGI keeps the
+perl interpreter running in memory.  During subsequent runs, this interpreter
+is used to handle new requests, instead of starting a new perl interpreter
+for each execution.
+
+SpeedyCGI conforms to the CGI specification, and does not work inside the
+web server.  A very fast cgi-bin (written in C) is executed for each request.
+This fast cgi-bin then contacts the persistent Perl process, which is usually
+already in memory, to do the work and return the results.
+
+Since all of these processes run outside the web server, they can't cause
+problems for the web server itself.  Also, each perl program runs as its own
+Unix process, so one program can't interfere with another.  Command line
+options can also be used to deal with programs that have memory leaks or
+other problems that might keep them from otherwise running persistently.
+
+
+Installation
+============
+
+SpeedyCGI has been tried with perl versions 5.004_04 and 5.005_02,
+and under Solaris 2.6, Redhat Linux 5.1, and FreeBSD 3.1.  There
+may be problems wither other OSes or earlier versions of Perl.
+
+To install, do the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+This will install a "speedy" binary in the same directory where "perl"
+was installed.
+
+
+
+Using SpeedyCGI
+===============
+
+To convert a script to use SpeedyCGI, change the #! interpreter line to
+call "speedy" instead of "perl".  The "speedy" binary, for the most part
+accepts the same command line options as perl.
+
+The speedy binary also accepts its own set of options, which must be put
+after a "--" at the end of the perl options.  The speedy binary accepts
+the following options:
+
+	-tN		If no new requests have been received after N
+			seconds, exit the persistent perl interpreter.
+			The default is 3600 (one hour).  Use 0 to indicate
+			no timeout.
+
+	-rN		Once the perl interpreter has run N times, exit.
+			The default is 0 (no max).
+
+	-Tprefix	Use the given prefix for creating temporary files.
+			This must be a filename prefix, not a directory name.
+			The default is "/tmp/speedy".
+	
+	-bN		Use N bytes for the buffer that sends data to
+			the CGI script.  Default is 1024.
+
+	-BN		Use N bytes for the buffer that receives data from
+			the CGI script.  Default is 8192.
+
+For example:
+	
+	#!/usr/local/bin/speedy -w -- -t300
+
+Will call SpeedyCGI with the perl option "-w" and will tell speedy
+to exit if no new requests have been received after 300 seconds.
+
+
+Sam Horrocks
+Daemon Consulting Inc.
+http://daemoninc.com
+sam@daemoninc.com

@@ -1,0 +1,16 @@
+MANIFEST
+Makefile.PL
+copybuf.c
+copybuf.h
+opts.c
+opts.h
+speedy.c
+speedy.h
+start_perl.c
+start_perl.h
+util.c
+util.h
+queue.c
+queue.h
+t/basic.t
+README
